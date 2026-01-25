@@ -302,6 +302,7 @@
             "program": "${workspaceFolder}/amd/samples/memoryread",
             "args": [
                 "-timing",
+                "-report-all"
             ]
         },
         {
