@@ -7,6 +7,7 @@ import (
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/dnn/training_benchmarks/lenet"
 
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var epochFlag = flag.Int("epoch", 1, "Number of epoch to run.")
@@ -24,6 +25,13 @@ GPU-to-CPU memory copies.`)
 func main() {
 	rand.Seed(1)
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // LeNet: imágenes 28x28x1 (MNIST) + pesos de la red
+    imageSize := 28 * 28 * 1  // 1 canal (gris)
+    batchSize := *batchSizeFlag
+    dataSize := uint64(batchSize * imageSize * 4)  // 4 bytes por float32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

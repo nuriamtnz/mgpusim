@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/dnn/layer_benchmarks/conv2d"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var n = flag.Int("N", 1, "batch size")
@@ -22,6 +23,14 @@ var enableBackward = flag.Bool("enable-backward", false, "enable backward")
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // Input: N*C*H*W + Kernel: outputC*C*kernelH*kernelW + Output aprox N*outputC*H*W
+    inputSize := (*n) * (*c) * (*h) * (*w)
+    kernelSize := (*outputC) * (*c) * (*kernelHeight) * (*kernelWidth)
+    outputSize := (*n) * (*outputC) * (*h) * (*w)
+    dataSize := uint64((inputSize + kernelSize + outputSize) * 4)  // 4 bytes por float32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

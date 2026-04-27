@@ -366,9 +366,6 @@ func (r *reporter) injectSIMDBusyTimeTracer(s *simulation.Simulation) {
 
 // PREFETCH IMPLEMENTATION NURIA
 func (r *reporter) injectPrefetchTracer(s *simulation.Simulation) {
-	if !*reportAll {
-		return
-	}
 	for _, comp := range s.Components() {
 		if !strings.Contains(comp.Name(), "L2") {
 			continue
@@ -562,6 +559,14 @@ func (r *reporter) reportCacheHitRate() {
 		writeHit := tracer.tracer.GetStepCount("write-hit")
 		writeMiss := tracer.tracer.GetStepCount("write-miss")
 		writeMSHRHit := tracer.tracer.GetStepCount("write-mshr-hit")
+		//NURIA
+		topDemandReadReq := tracer.tracer.GetStepCount("top-demand-read-req")
+		topPrefetchReadReq := tracer.tracer.GetStepCount("top-prefetch-read-req")
+		prefAbortL1Hit := tracer.tracer.GetStepCount("pref-abort-l1-hit")
+		prefAbortMSHRHit := tracer.tracer.GetStepCount("pref-abort-mshr-hit")
+		prefAbortPortFull := tracer.tracer.GetStepCount("pref-abort-port-full")
+		prefAbortInflightLimit := tracer.tracer.GetStepCount("pref-abort-inflight-limit")
+		prefSentToL2 := tracer.tracer.GetStepCount("pref-sent-to-l2")
 
 		totalTransaction := readHit + readMiss + readMSHRHit +
 			writeHit + writeMiss + writeMSHRHit
@@ -604,6 +609,52 @@ func (r *reporter) reportCacheHitRate() {
 			Location: tracer.cache.Name(),
 			What:     "write-mshr-hit",
 			Value:    float64(writeMSHRHit),
+			Unit:     "count",
+		})
+
+		//NURIA
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "top-demand-read-req",
+			Value:    float64(topDemandReadReq),
+			Unit:     "count",
+		})
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "top-prefetch-read-req",
+			Value:    float64(topPrefetchReadReq),
+			Unit:     "count",
+		})
+
+		// NURIA: Nuevos InsertData para L1 Prefetch
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "pref-abort-l1-hit",
+			Value:    float64(prefAbortL1Hit),
+			Unit:     "count",
+		})
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "pref-abort-mshr-hit",
+			Value:    float64(prefAbortMSHRHit),
+			Unit:     "count",
+		})
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "pref-abort-port-full",
+			Value:    float64(prefAbortPortFull),
+			Unit:     "count",
+		})
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "pref-abort-inflight-limit",
+			Value:    float64(prefAbortInflightLimit),
+			Unit:     "count",
+		})
+		r.dataRecorder.InsertData(tableName, metric{
+			Location: tracer.cache.Name(),
+			What:     "pref-sent-to-l2",
+			Value:    float64(prefSentToL2),
 			Unit:     "count",
 		})
 	}
@@ -735,9 +786,6 @@ func (r *reporter) reportDRAMTransactionCount() {
 
 // IMPLEMENTATION PREFETCHING NURIA
 func (r *reporter) reportPrefetchStats() {
-	if !*reportAll && !r.ReportPrefetchStats {
-		return
-	}
 
 	for _, t := range r.prefetchTracers {
 		missL2MSHR := t.tracer.GetStepCount("prefetch-req-miss")
@@ -745,6 +793,9 @@ func (r *reporter) reportPrefetchStats() {
 		hitL2 := t.tracer.GetStepCount("prefetch-req-hit-l2")
 		hits := t.tracer.GetStepCount("prefetch-hit")
 		firstHits := t.tracer.GetStepCount("prefetch-first-hit")
+		prefetchEvict := t.tracer.GetStepCount("prefetch-evict")
+		readHitByPrefetch := t.tracer.GetStepCount("read-hit-by-prefetch")
+		readMSHRHitByPrefetch := t.tracer.GetStepCount("read-mshr-hit-by-prefetch")
 
 		loc := t.cache.Name()
 
@@ -780,63 +831,26 @@ func (r *reporter) reportPrefetchStats() {
 			Unit:     "count",
 		})
 
-		// pref-req-sent = total de prefetches que L2 recibió
-		prefReqSent := missL2MSHR + hitMSHR + hitL2
+		// Contador crudo de evictions de bloques prefetcheados
 		r.dataRecorder.InsertData(tableName, metric{
 			Location: loc,
-			What:     "pref-req-sent",
-			Value:    float64(prefReqSent),
+			What:     "prefetch-evict",
+			Value:    float64(prefetchEvict),
 			Unit:     "count",
 		})
 
-		// pref-blocks-wasted = prefetches que no se usaron
-		prefBlocksWasted := max(prefReqSent-firstHits, 0)
 		r.dataRecorder.InsertData(tableName, metric{
 			Location: loc,
-			What:     "pref-blocks-wasted",
-			Value:    float64(prefBlocksWasted),
+			What:     "read-hit-by-prefetch",
+			Value:    float64(readHitByPrefetch),
 			Unit:     "count",
 		})
 
-		// MÉTRICAS DERIVADAS
-		var wasteRatio float64
-		if prefReqSent > 0 {
-			wasteRatio = (float64(prefBlocksWasted) / float64(prefReqSent)) * 100
-		}
 		r.dataRecorder.InsertData(tableName, metric{
 			Location: loc,
-			What:     "pref-waste-ratio",
-			Value:    float64(wasteRatio),
-			Unit:     "percent",
-		})
-
-		//calculo preciosión
-		// Precisión = bloques prefetch que se usaron / total de prefetches enviados
-		// = firstHits / prefReqSent
-		var precision float64
-		if prefReqSent > 0 {
-			precision = (float64(firstHits) / float64(prefReqSent)) * 100
-		}
-
-		//calculo cobertura
-		// Cobertura = firstHits / missL2MSHR
-		var coverage float64
-		if missL2MSHR > 0 {
-			coverage = (float64(firstHits) / float64(missL2MSHR)) * 100
-		}
-
-		r.dataRecorder.InsertData(tableName, metric{
-			Location: loc,
-			What:     "pref-precision",
-			Value:    precision,
-			Unit:     "percent",
-		})
-
-		r.dataRecorder.InsertData(tableName, metric{
-			Location: loc,
-			What:     "pref-coverage",
-			Value:    coverage,
-			Unit:     "percent",
+			What:     "read-mshr-hit-by-prefetch",
+			Value:    float64(readMSHRHitByPrefetch),
+			Unit:     "count",
 		})
 
 	}

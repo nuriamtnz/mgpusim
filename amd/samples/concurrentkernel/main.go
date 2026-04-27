@@ -8,10 +8,17 @@ import (
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/amdappsdk/bitonicsort"
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/heteromark/fir"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Suma de ambos benchmarks
+    firLength := 10240
+    bsLength := 64
+    dataSize := uint64((firLength + bsLength) * 4)  // 4 bytes aprox
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/driver"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 // Benchmark defines a benchmark
@@ -76,6 +77,11 @@ func (b *Benchmark) Verify() {
 
 func main() {
 	flag.Parse()
+
+	
+    // PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    byteSize := uint64(1048576)  // 1 MB por defecto
+    writearound.SetDataSize(byteSize)
 
 	runner := new(runner.Runner).Init()
 

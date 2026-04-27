@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/dnn/training_benchmarks/minerva"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var epochFlag = flag.Int("epoch", 1, "Number of epoch to run.")
@@ -21,6 +22,13 @@ GPU-to-CPU memory copies.`)
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // Minerva: similar a LeNet pero red más compleja
+    imageSize := 28 * 28 * 1  // MNIST típicamente
+    batchSize := *batchSizeFlag
+    dataSize := uint64(batchSize * imageSize * 4)  // 4 bytes por float32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

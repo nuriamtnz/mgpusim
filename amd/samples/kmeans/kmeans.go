@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/heteromark/kmeans"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var points = flag.Int("points", 1024, "The number of points.")
@@ -16,6 +17,13 @@ var maxIter = flag.Int("max-iter", 5,
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // Puntos: points*features + Centroides: clusters*features
+    pointsData := (*points) * (*features)
+    clusterData := (*clusters) * (*features)
+    dataSize := uint64((pointsData + clusterData) * 4)  // 4 bytes por float32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

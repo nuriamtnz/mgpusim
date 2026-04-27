@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/dnn/layer_benchmarks/im2col"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var n = flag.Int("N", 1, "batch size")
@@ -22,6 +23,13 @@ var dilateY = flag.Int("dilate-y", 1, "dilation on the y axis")
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // Input: N*C*H*W + Output: N*C*kernelH*kernelW*(H_out*W_out) aprox
+    inputSize := (*n) * (*c) * (*h) * (*w)
+    outputSize := inputSize * (*kernelHeight) * (*kernelWidth)  // Aproximación
+    dataSize := uint64((inputSize + outputSize) * 4)  // 4 bytes por float32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

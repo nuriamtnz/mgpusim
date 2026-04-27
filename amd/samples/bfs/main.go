@@ -7,6 +7,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/shoc/bfs"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var path = flag.String("load-graph", "", "Path to file from which graph to be loaded. "+
@@ -19,6 +20,12 @@ var maxDepth = flag.Int("depth", 0, "The max depth to search, 0 means unlimited"
 
 func main() {
 	flag.Parse()
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    // Aproximación: nodos + aristas (numNode * degree)
+    numNodes := *numNode
+    numEdges := numNodes * (*degree)
+    dataSize := uint64((numNodes*8 + numEdges*8))  // 8 bytes aprox por entrada
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 

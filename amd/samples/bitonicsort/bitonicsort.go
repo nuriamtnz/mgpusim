@@ -5,6 +5,7 @@ import (
 
 	"github.com/sarchlab/mgpusim/v4/amd/benchmarks/amdappsdk/bitonicsort"
 	"github.com/sarchlab/mgpusim/v4/amd/samples/runner"
+	"github.com/sarchlab/akita/v4/mem/cache/writearound"
 )
 
 var length = flag.Int("length", 1024, "The length of array to sort.")
@@ -12,6 +13,10 @@ var orderAscending = flag.Bool("order-asc", true, "Sorting in ascending order.")
 
 func main() {
 	flag.Parse()
+
+	// PREFETCH IMPLEMENTATION NURIA - Informar al caché el tamaño de datos
+    dataSize := uint64(*length * 4)  // 4 bytes por uint32
+    writearound.SetDataSize(dataSize)
 
 	runner := new(runner.Runner).Init()
 
