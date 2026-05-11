@@ -25,8 +25,6 @@ def run(data):
             ax.text(j, i, f"{speedups[i, j]:.3f}",
                     ha="center", va="center", color=color, fontsize=7)
 
-    ax.set_title("Speedup relativo por benchmark y modo\n(verde = mejor, rojo = peor)",
-                 fontweight="bold")
     plt.colorbar(im, ax=ax, label="Speedup", shrink=0.8)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "09_heatmap_speedup.png", dpi=300, bbox_inches="tight")

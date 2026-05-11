@@ -1,8 +1,8 @@
 #p17_l2_requests.py
 import numpy as np
 import matplotlib.pyplot as plt
-from plot_utils import smart_ylim
-from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR
+from plot_utils import smart_ylim, top_right_legend
+from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR, REF_LINE_COLOR
 
 
 def run(data):
@@ -27,18 +27,16 @@ def run(data):
         ax.bar(x + i * width, prefetch_norm, width, color=COLORS[i], alpha=0.4,
                label=f"{mode} — prefetch", bottom=demand_norm)
 
-    ax.axhline(1.0, color="red", linestyle="--", linewidth=1.5,
-               alpha=0.8, label="Baseline demand reads")
+    ax.axhline(1.0, color=REF_LINE_COLOR, linestyle="--", linewidth=1.2,
+               alpha=0.85, label="Baseline demand reads")
 
     smart_ylim(ax, all_tops + [1.0], force_zero=True)
 
-    ax.set_title("Peticiones totales recibidas por L2\n"
-                 "(oscuro = demanda real · claro = prefetch · normalizado al baseline demand-read)",
-                 fontweight="bold")
     ax.set_ylabel("Ratio respecto baseline demand-reads", fontsize=11)
     ax.set_xticks(x + 2 * width)
     ax.set_xticklabels(BENCHMARKS, rotation=90, fontsize=8)
-    ax.legend(fontsize=9, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    # 11 elementos → 6 columnas × 2 filas
+    top_right_legend(ax, ncol=6, fontsize=9)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "17_l2_total_requests.png", dpi=300, bbox_inches="tight")

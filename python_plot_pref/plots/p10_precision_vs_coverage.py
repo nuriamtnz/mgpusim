@@ -1,5 +1,6 @@
 # 10_precision_vs_coverage.py
 import matplotlib.pyplot as plt
+from plot_utils import top_right_legend
 from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR
 
 
@@ -19,9 +20,7 @@ def run(data):
     ax.axvline(50, color="gray", linestyle=":", alpha=0.5)
     ax.set_xlabel("Precisión (%)", fontsize=12, fontweight="bold")
     ax.set_ylabel("Cobertura (%)", fontsize=12, fontweight="bold")
-    ax.set_title("Trade-off Precisión vs Cobertura\n"
-                 "(ideal: esquina superior derecha)", fontweight="bold")
-    ax.legend(fontsize=11, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    top_right_legend(ax, fontsize=11)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "10_precision_vs_coverage.png", dpi=300, bbox_inches="tight")

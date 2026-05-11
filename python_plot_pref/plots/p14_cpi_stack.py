@@ -1,7 +1,8 @@
 # p14_cpi_stack.py
 import numpy as np
 import matplotlib.pyplot as plt
-from config import BENCHMARKS, MODES, PLOTS_DIR
+from plot_utils import top_right_legend
+from config import BENCHMARKS, MODES, PALETTE, PLOTS_DIR
 
 def run(data):
     fig, ax = plt.subplots(figsize=(max(18, len(BENCHMARKS) * 1.2), 7))
@@ -9,9 +10,12 @@ def run(data):
     n_modes = len(MODES)
     width = 0.8 / n_modes
 
+    # Colores tomados de la paleta unificada para mantener coherencia entre gráficas.
+    c_valu, c_vmem, c_smem, c_fetch, c_other = PALETTE[:5]
+
     for i, mode in enumerate(MODES):
         offset = (i - n_modes/2 + 0.5) * width
-        
+
         valu_v  = [data[b][mode]["cpi_valu"]       for b in BENCHMARKS]
         vmem_v  = [data[b][mode]["cpi_vmem"]       for b in BENCHMARKS]
         smem_v  = [data[b][mode]["cpi_scalarmem"]  for b in BENCHMARKS]
@@ -29,22 +33,21 @@ def run(data):
         l_fetch = "Fetch (instrucciones)"       if i == 0 else ""
         l_other = "Otros"                       if i == 0 else ""
 
-        ax.bar(x + offset, valu_v, width, label=l_valu, color="#E74C3C", alpha=0.9, edgecolor='white', linewidth=0.2)
-        ax.bar(x + offset, vmem_v, width, bottom=b2, label=l_vmem, color="#3498DB", alpha=0.9, edgecolor='white', linewidth=0.2)
-        ax.bar(x + offset, smem_v, width, bottom=b3, label=l_smem, color="#2ECC71", alpha=0.9, edgecolor='white', linewidth=0.2)
-        ax.bar(x + offset, fetch_v,width, bottom=b4, label=l_fetch, color="#F39C12", alpha=0.9, edgecolor='white', linewidth=0.2)
-        ax.bar(x + offset, other_v,width, bottom=b5, label=l_other, color="#95A5A6", alpha=0.9, edgecolor='white', linewidth=0.2)
+        ax.bar(x + offset, valu_v, width, label=l_valu, color=c_valu, alpha=0.9, edgecolor='white', linewidth=0.2)
+        ax.bar(x + offset, vmem_v, width, bottom=b2, label=l_vmem, color=c_vmem, alpha=0.9, edgecolor='white', linewidth=0.2)
+        ax.bar(x + offset, smem_v, width, bottom=b3, label=l_smem, color=c_smem, alpha=0.9, edgecolor='white', linewidth=0.2)
+        ax.bar(x + offset, fetch_v,width, bottom=b4, label=l_fetch, color=c_fetch, alpha=0.9, edgecolor='white', linewidth=0.2)
+        ax.bar(x + offset, other_v,width, bottom=b5, label=l_other, color=c_other, alpha=0.9, edgecolor='white', linewidth=0.2)
 
         # Nombre del modo encima de cada barra
         for j in range(len(BENCHMARKS)):
             tot = valu_v[j] + vmem_v[j] + smem_v[j] + fetch_v[j] + other_v[j]
             ax.text(x[j] + offset, tot + 0.05, mode, rotation=90, ha='center', va='bottom', fontsize=6)
 
-    ax.set_title("CPI Stack Comparativo (Baseline vs Modos de Prefetch)\nVisualiza cómo el bloque azul (VMem) se reduce con buen prefetching", fontweight="bold")
     ax.set_ylabel("Ciclos por instrucción (CPI)", fontsize=11)
     ax.set_xticks(x)
     ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=9)
-    ax.legend(fontsize=9, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    top_right_legend(ax, fontsize=9)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "14_cpi_stack_grouped.png", dpi=300, bbox_inches="tight")

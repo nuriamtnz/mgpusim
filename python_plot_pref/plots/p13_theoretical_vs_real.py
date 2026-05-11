@@ -1,8 +1,8 @@
 #p13_theoretical_vs_real.py
 import numpy as np
 import matplotlib.pyplot as plt
-from plot_utils import smart_ylim
-from config import BENCHMARKS, MODES, PLOTS_DIR
+from plot_utils import smart_ylim, top_right_legend
+from config import BENCHMARKS, MODES, PALETTE, PLOTS_DIR, REF_LINE_COLOR
 
 
 def run(data):
@@ -16,20 +16,18 @@ def run(data):
 
     ax.bar(x - width / 2, theoretical, width,
            label="Speedup teórico máximo (Ley de Amdahl)",
-           color="#FFB347", alpha=0.85, edgecolor="black", linewidth=0.5)
+           color=PALETTE[1], alpha=0.85, edgecolor="black", linewidth=0.5)
     ax.bar(x + width / 2, best_real, width,
            label="Mejor speedup real (mejor modo)",
-           color="#85C1E9", alpha=0.85, edgecolor="black", linewidth=0.5)
-    ax.axhline(y=1.0, color="red", linestyle="--", linewidth=1.5,
-               alpha=0.7, label="Baseline")
+           color=PALETTE[0], alpha=0.85, edgecolor="black", linewidth=0.5)
+    ax.axhline(y=1.0, color=REF_LINE_COLOR, linestyle="--", linewidth=1.2,
+               alpha=0.85, label="Baseline")
 
     smart_ylim(ax, all_vals, force_zero=False)
-    ax.set_title("Speedup teórico (Amdahl) vs mejor speedup real\n"
-                 "La brecha indica potencial no aprovechado", fontweight="bold")
     ax.set_ylabel("Speedup (ratio)", fontsize=11)
     ax.set_xticks(x)
     ax.set_xticklabels(BENCHMARKS, rotation=90, fontsize=8)
-    ax.legend(fontsize=11, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    top_right_legend(ax, fontsize=10)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "13_theoretical_vs_real_speedup.png", dpi=300, bbox_inches="tight")

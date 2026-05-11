@@ -2,7 +2,7 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR
+from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR, REF_LINE_COLOR
 
 #  Zoom de eje Y
 #
@@ -37,6 +37,32 @@ def smart_ylim(ax, values, force_zero=False, margin_ratio=0.15):
     ax.set_ylim(lo, hi)
 
 
+#  Leyenda en la esquina superior derecha, encima del eje (estilo artículo).
+def top_right_legend(ax, ncol=None, fontsize=10):
+    """
+    Sitúa la leyenda encima del eje, alineada a la derecha.
+
+    ncol : número de columnas. Si es None se calcula automáticamente
+           para que la leyenda quepa en una fila (máx. 6 elementos).
+    """
+    handles, labels = ax.get_legend_handles_labels()
+    if not handles:
+        return
+    if ncol is None:
+        ncol = min(len(handles), 6)
+    ax.legend(
+        handles, labels,
+        loc="lower right",
+        bbox_to_anchor=(1.0, 1.02),
+        ncol=ncol,
+        fontsize=fontsize,
+        frameon=False,
+        borderaxespad=0.0,
+        handletextpad=0.5,
+        columnspacing=1.2,
+    )
+
+
 #  Generador genérico de barras agrupadas
 
 def plot_bars(data, metric_key, title, ylabel, filename,
@@ -62,20 +88,21 @@ def plot_bars(data, metric_key, title, ylabel, filename,
                 val = val / base_val if base_val > 0 else 0.0
             values.append(val)
         all_values.extend(values)
-        ax.bar(x + i * width, values, width, label=mode, color=COLORS[i])
+        ax.bar(x + i * width, values, width, label=mode, color=COLORS[i],
+               edgecolor="black", linewidth=0.4)
 
     if reference_line is not None:
-        ax.axhline(y=reference_line, color="red", linestyle="--",
-                   linewidth=1.5, alpha=0.8,
+        ax.axhline(y=reference_line, color=REF_LINE_COLOR, linestyle="--",
+                   linewidth=1.2, alpha=0.85,
                    label=f"Referencia ({reference_line})")
 
     smart_ylim(ax, all_values, force_zero=force_zero)
 
-    ax.set_title(title, fontweight="bold", fontsize=11)
+    # El título se omite intencionalmente: el pie de foto del documento lo describe.
     ax.set_ylabel(ylabel, fontsize=11)
     ax.set_xticks(x + 2 * width)
     ax.set_xticklabels(BENCHMARKS, rotation=90, fontsize=9)
-    ax.legend(fontsize=11, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    top_right_legend(ax, fontsize=10)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / filename, dpi=300, bbox_inches="tight")

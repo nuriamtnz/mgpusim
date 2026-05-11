@@ -1,6 +1,7 @@
 #p12_stacked_destinations.py
 import numpy as np
 import matplotlib.pyplot as plt
+from plot_utils import top_right_legend
 from config import BENCHMARKS, MODES, COLORS, PLOTS_DIR
 
 
@@ -30,12 +31,10 @@ def run(data):
                bottom=[a + b for a, b in zip(miss_v, mshr_v)])
 
     ax.set_ylabel("Porcentaje (%)", fontsize=11)
-    ax.set_title("Destino de peticiones de prefetch\n"
-                 "(oscuro = fue a RAM · medio = hit MSHR · claro = hit L2)",
-                 fontweight="bold")
     ax.set_xticks(x + width * 1.5)
     ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=8)
-    ax.legend(fontsize=9, loc="upper left", bbox_to_anchor=(1.01, 1), borderaxespad=0)
+    # 12 elementos → 4 columnas × 3 filas para que la leyenda quepa encima del eje
+    top_right_legend(ax, ncol=4, fontsize=9)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "12_stacked_destinations.png", dpi=300, bbox_inches="tight")
