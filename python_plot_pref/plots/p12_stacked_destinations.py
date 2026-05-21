@@ -30,11 +30,12 @@ def run(data):
         ax.bar(x + offset, l2_v,   width, color=c, alpha=0.25, label=f"{mode} — hit L2",
                bottom=[a + b for a, b in zip(miss_v, mshr_v)])
 
-    ax.set_ylabel("Porcentaje (%)", fontsize=11)
+    ax.set_ylabel("Porcentaje (%)", fontsize=14)
     ax.set_xticks(x + width * 1.5)
-    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=8)
+    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
     # 12 elementos → 4 columnas × 3 filas para que la leyenda quepa encima del eje
-    top_right_legend(ax, ncol=4, fontsize=9)
+    top_right_legend(ax, ncol=4, fontsize=11)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "12_stacked_destinations.png", dpi=300, bbox_inches="tight")

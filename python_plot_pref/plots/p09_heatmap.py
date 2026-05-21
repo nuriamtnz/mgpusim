@@ -16,16 +16,18 @@ def run(data):
     im = ax.imshow(speedups, cmap="RdYlGn", aspect="auto", vmin=vmin, vmax=vmax)
     ax.set_xticks(np.arange(len(MODES[1:])))
     ax.set_yticks(np.arange(len(BENCHMARKS)))
-    ax.set_xticklabels(MODES[1:], fontsize=11)
-    ax.set_yticklabels(BENCHMARKS, fontsize=9)
+    ax.set_xticklabels(MODES[1:], fontsize=13)
+    ax.set_yticklabels(BENCHMARKS, fontsize=12)
 
     for i in range(len(BENCHMARKS)):
         for j in range(len(MODES[1:])):
             color = "white" if speedups[i, j] < (vmin + (vmax - vmin) * 0.3) else "black"
             ax.text(j, i, f"{speedups[i, j]:.3f}",
-                    ha="center", va="center", color=color, fontsize=7)
+                    ha="center", va="center", color=color, fontsize=10)
 
-    plt.colorbar(im, ax=ax, label="Speedup", shrink=0.8)
+    cbar = plt.colorbar(im, ax=ax, label="Speedup", shrink=0.8)
+    cbar.ax.tick_params(labelsize=11)
+    cbar.set_label("Speedup", fontsize=13)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "09_heatmap_speedup.png", dpi=300, bbox_inches="tight")
     plt.close()

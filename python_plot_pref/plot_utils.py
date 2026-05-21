@@ -38,7 +38,7 @@ def smart_ylim(ax, values, force_zero=False, margin_ratio=0.15):
 
 
 #  Leyenda en la esquina superior derecha, encima del eje (estilo artículo).
-def top_right_legend(ax, ncol=None, fontsize=10):
+def top_right_legend(ax, ncol=None, fontsize=12):
     """
     Sitúa la leyenda encima del eje, alineada a la derecha.
 
@@ -99,10 +99,11 @@ def plot_bars(data, metric_key, title, ylabel, filename,
     smart_ylim(ax, all_values, force_zero=force_zero)
 
     # El título se omite intencionalmente: el pie de foto del documento lo describe.
-    ax.set_ylabel(ylabel, fontsize=11)
+    ax.set_ylabel(ylabel, fontsize=14)
     ax.set_xticks(x + 2 * width)
-    ax.set_xticklabels(BENCHMARKS, rotation=90, fontsize=9)
-    top_right_legend(ax, fontsize=10)
+    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
+    top_right_legend(ax, fontsize=12)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / filename, dpi=300, bbox_inches="tight")
@@ -122,7 +123,7 @@ def plot_table(cell_text, col_labels, filename):
     tabla = ax.table(cellText=cell_text, colLabels=col_labels,
                      loc="center", cellLoc="center")
     tabla.auto_set_font_size(False)
-    tabla.set_fontsize(8)
+    tabla.set_fontsize(10)
     tabla.scale(1, 1.5)
     fig.savefig(PLOTS_DIR / filename, dpi=300, bbox_inches="tight")
     plt.close()

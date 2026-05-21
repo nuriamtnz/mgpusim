@@ -32,11 +32,12 @@ def run(data):
 
     smart_ylim(ax, all_tops + [1.0], force_zero=True)
 
-    ax.set_ylabel("Ratio respecto baseline demand-reads", fontsize=11)
+    ax.set_ylabel("Ratio respecto baseline demand-reads", fontsize=14)
     ax.set_xticks(x + 2 * width)
-    ax.set_xticklabels(BENCHMARKS, rotation=90, fontsize=8)
+    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
     # 11 elementos → 6 columnas × 2 filas
-    top_right_legend(ax, ncol=6, fontsize=9)
+    top_right_legend(ax, ncol=6, fontsize=11)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "17_l2_total_requests.png", dpi=300, bbox_inches="tight")

@@ -48,15 +48,16 @@ def run(data):
         for j in range(len(BENCHMARKS)):
             total_height = remaining[j] + to_mshr[j] + to_hit[j] + org_mshr[j] + org_hit[j]
             if total_height > 0.05: # Solo si hay algo que mostrar
-                ax.text(x[j] + offset, total_height + 0.02, mode, rotation=90, ha='center', va='bottom', fontsize=6)
+                ax.text(x[j] + offset, total_height + 0.02, mode, rotation=90, ha='center', va='bottom', fontsize=8)
 
     ax.axhline(1.0, color=REF_LINE_COLOR, linestyle="--",
                linewidth=1.2, alpha=0.85, label="Total demandas (Baseline)")
 
-    ax.set_ylabel("Fracción respecto al total de demandas base", fontsize=11)
+    ax.set_ylabel("Fracción respecto al total de demandas base", fontsize=14)
     ax.set_xticks(x)
-    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=9)
-    top_right_legend(ax, fontsize=9)
+    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
+    top_right_legend(ax, fontsize=11)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "16_miss_reclassification.png", dpi=300, bbox_inches="tight")

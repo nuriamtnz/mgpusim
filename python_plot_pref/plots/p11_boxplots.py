@@ -21,10 +21,11 @@ def run(data):
         if add_hline:
             ax.axhline(1.0, color=REF_LINE_COLOR, linestyle="--",
                        linewidth=1.2, alpha=0.85, label="Baseline")
-            top_right_legend(ax, fontsize=10)
+            top_right_legend(ax, fontsize=12)
         smart_ylim(ax, all_values, force_zero=force_zero)
-        ax.set_ylabel(ylabel, fontsize=11)
-        ax.tick_params(axis="x", labelsize=11)
+        ax.set_ylabel(ylabel, fontsize=14)
+        ax.tick_params(axis="x", labelsize=13)
+        ax.tick_params(axis="y", labelsize=12)
         ax.grid(axis="y", alpha=0.3)
 
     plt.tight_layout()

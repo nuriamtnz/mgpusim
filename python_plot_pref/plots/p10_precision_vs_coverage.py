@@ -13,14 +13,15 @@ def run(data):
                    s=80, alpha=0.75, edgecolors="black", linewidths=0.5)
         for b, p, c in zip(BENCHMARKS, prec, cov):
             if p > 15 or c > 15:
-                ax.annotate(b, (p, c), fontsize=7, alpha=0.85,
+                ax.annotate(b, (p, c), fontsize=10, alpha=0.85,
                             xytext=(3, 3), textcoords="offset points")
 
     ax.axhline(50, color="gray", linestyle=":", alpha=0.5)
     ax.axvline(50, color="gray", linestyle=":", alpha=0.5)
-    ax.set_xlabel("Precisión (%)", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Cobertura (%)", fontsize=12, fontweight="bold")
-    top_right_legend(ax, fontsize=11)
+    ax.set_xlabel("Precisión (%)", fontsize=15, fontweight="bold")
+    ax.set_ylabel("Cobertura (%)", fontsize=15, fontweight="bold")
+    ax.tick_params(axis="both", labelsize=12)
+    top_right_legend(ax, fontsize=13)
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "10_precision_vs_coverage.png", dpi=300, bbox_inches="tight")

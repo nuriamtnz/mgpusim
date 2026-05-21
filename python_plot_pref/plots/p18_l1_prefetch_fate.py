@@ -51,12 +51,13 @@ def run(data):
         for j in range(len(BENCHMARKS)):
             tot = sent_v[j] + l1_v[j] + mshr_v[j] + port_v[j] + infl_v[j]
             if tot > 0.1:
-                ax.text(x[j] + offset, tot + 2, mode, rotation=90, ha='center', va='bottom', fontsize=6)
+                ax.text(x[j] + offset, tot + 2, mode, rotation=90, ha='center', va='bottom', fontsize=8)
 
-    ax.set_ylabel("Porcentaje sobre Prefetches Generados (%)", fontsize=11)
+    ax.set_ylabel("Porcentaje sobre Prefetches Generados (%)", fontsize=14)
     ax.set_xticks(x)
-    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=9)
-    top_right_legend(ax, fontsize=9)
+    ax.set_xticklabels(BENCHMARKS, rotation=45, ha="right", fontsize=12)
+    ax.tick_params(axis="y", labelsize=12)
+    top_right_legend(ax, fontsize=11)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     fig.savefig(PLOTS_DIR / "18_l1_prefetch_fate.png", dpi=300, bbox_inches="tight")
